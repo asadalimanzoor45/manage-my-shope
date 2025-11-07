@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage My Shope</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root{
+      --bg-grad: linear-gradient(135deg,#2b8cff,#7b2cff);
+      --card-grad: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      --glass: rgba(255,255,255,0.03);
+      --accent: #7b2cff;
+      --muted: rgba(255,255,255,0.7);
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font-sans);
+      background:var(--bg-grad);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+    }
+
+    /* Layout: single column now */
+    .app{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      padding:20px;
+      transition:all .3s ease;
+    }
+
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      min-height:60vh;
+    }
+
+    header.topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:var(--glass);
+      padding:10px 14px;
+      border-radius:12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      gap:8px;
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+    .top-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .brand h1{font-size:18px;margin:0;letter-spacing:0.2px}
+
+    .searchbar{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(0,0,0,0.12);
+      padding:6px 10px;border-radius:10px;
+      min-width:220px;
+    }
+    .searchbar input{
+      border:0;background:transparent;color:#fff;outline:none;width:160px;
+    }
+
+    .userbox{
+      display:flex;gap:12px;align-items:center;
+    }
+    .avatar{
+      width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#fff2,#fff1);display:flex;align-items:center;justify-content:center;color:#222;font-weight:700;
+    }
+
+    /* New sticky second-line nav bar */
+    .topnav-wrap{
+      position:sticky;
+      top:66px; /* header height + small gap */
+      z-index:19;
+    }
+    .topnav{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      background:rgba(255,255,255,0.03);
+      padding:8px 12px;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width: thin;
+    }
+    .topnav a{
+      color:var(--muted);
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:8px;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+      border:1px solid transparent;
+    }
+    .topnav a.active, .topnav a:hover{
+      background:rgba(255,255,255,0.04);
+      color:#fff;
+      transform:translateY(-1px);
+    }
+
+    /* Content area */
+    .content{
+      padding:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius:12px;
+      min-height:200px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:14px;
+    }
+    .card{
+      padding:14px;border-radius:12px;background:var(--card-grad);
+    }
+    .card h3{margin:0 0 8px 0;font-size:14px;color:var(--muted)}
+    .big-num{font-size:24px;font-weight:700}
+
+    .table{
+      width:100%;border-collapse:collapse;margin-top:10px;
+    }
+    .table th, .table td{
+      text-align:left;padding:8px 10px;border-bottom:1px dashed rgba(255,255,255,0.04);
+      font-size:13px;color:#eef;
+    }
+    .controls{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    }
+    .btn{
+      background:transparent;border:1px solid rgba(255,255,255,0.08);padding:8px 10px;border-radius:8px;color:#fff;cursor:pointer;transition:all .12s ease;
+    }
+    .btn.primary{background:linear-gradient(90deg,#2b8cff,#7b2cff);border:0}
+    .btn.danger{background:transparent;border:1px solid rgba(255,0,0,0.12);color:var(--danger)}
+
+    form .form-row{display:flex;gap:10px;flex-wrap:wrap}
+    form input, form select, form textarea{
+      padding:8px 10px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#fff;outline:none;min-width:160px;
+    }
+
+    .footer{
+      padding:12px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.7);font-size:13px;text-align:center;
+    }
+
+    /* Landing */
+    .landing{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:24px;
+      padding:40px 0;
+    }
+    .landing-card{
+      width:300px;
+      padding:20px;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      text-align:center;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .landing-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.35)}
+    .landing-card h3{margin-bottom:8px}
+    .back-to-choose{margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
+
+    /* responsive */
+    @media(max-width:1000px){
+      .app{padding:12px}
+      header.topbar{padding:10px}
+      .topnav-wrap{position:sticky; top:64px}
+    }
+
+    @media(max-width:720px){
+      .grid{grid-template-columns:1fr}
+      .searchbar input{width:90px}
+      .table th, .table td{font-size:12px}
+      .landing{flex-direction:column;gap:16px}
+    }
+
+    .fade-in{animation:fadeIn .35s ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:13px}
+    .status.pending{background:rgba(255,193,7,0.12);color:var(--warning);padding:6px 10px;border-radius:8px}
+    .status.completed{background:rgba(40,167,69,0.12);color:var(--success);padding:6px 10px;border-radius:8px}
+    .status.cancelled{background:rgba(220,53,69,0.08);color:var(--danger);padding:6px 10px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <main class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <div class="brand">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#fff2,#fff1);display:flex;align-items:center;justify-content:center;color:#222;font-weight:700">MM</div>
+            <div>
+              <h1>Manage My Shope</h1>
+              <div style="font-size:12px;color:var(--muted)">Mobile Repair Shop System</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="searchbar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input placeholder="Quick search..." id="globalSearch" />
+          </div>
+
+          <div class="userbox">
+            <div id="currentUserChip" class="chip">Not logged</div>
+            <div style="text-align:right">
+              <div id="userFullName" style="font-weight:700">Guest</div>
+              <div style="font-size:12px;color:var(--muted)" id="userRoleSmall">Not logged</div>
+            </div>
+            <div class="avatar" id="userAvatar">G</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Sticky top nav (second line) -->
+      <div class="topnav-wrap">
+        <nav class="topnav" id="topNavLinks">
+          <a href="#" data-page="analytics" class="active"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+          <a href="#" data-page="customers"><i class="fa-solid fa-user-gear"></i> Customers</a>
+          <a href="#" data-page="expenses"><i class="fa-solid fa-wallet"></i> Expenses</a>
+          <a href="#" data-page="users" id="userMgmtLink" style="display:none"><i class="fa-solid fa-users"></i> User Management</a>
+          <a href="#" data-action="logout" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+      </div>
+
+      <section class="content" id="pageContent">
+        <!-- Landing: choose Admin or User -->
+        <div id="chooseLogin" class="landing fade-in">
+          <div class="landing-card" id="chooseAdmin">
+            <h3>Login as Admin</h3>
+            <p style="color:var(--muted);margin-bottom:12px">Access admin dashboard and user management</p>
+            <button class="btn primary" id="adminLoginBtn">Admin Login</button>
+          </div>
+
+          <div class="landing-card" id="chooseUser">
+            <h3>Login as User</h3>
+            <p style="color:var(--muted);margin-bottom:12px">Access regular user dashboard</p>
+            <button class="btn primary" id="userLoginBtn">User Login</button>
+          </div>
+        </div>
+
+        <!-- Login view (hidden initially) -->
+        <div id="loginView" class="fade-in" style="display:none">
+          <h2 style="margin-top:0" id="loginTitle">Sign in</h2>
+          <form id="loginForm" style="display:flex;flex-direction:column;gap:10px;max-width:420px">
+            <input placeholder="Username" id="loginUsername" autocomplete="off" required />
+            <input placeholder="Password" id="loginPassword" type="password" autocomplete="new-password" required />
+            <div style="display:flex;gap:8px">
+              <button class="btn primary" type="submit" id="signInBtn">Sign in</button>
+              <button class="btn" type="button" id="backToChoose">Back</button>
+            </div>
+            <div id="loginNote" style="color:var(--muted);font-size:13px;margin-top:6px"></div>
+          </form>
+        </div>
+
+        <!-- App views (hidden until login) -->
+        <div id="appViews" style="display:none">
+          <!-- Analytics -->
+          <div id="analyticsPage" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h2 style="margin:0">Analytics</h2>
+              <div class="controls">
+                <label style="font-size:13px;color:var(--muted)">Sort By</label>
+                <select id="analyticsFilter" class="btn">
+                  <option value="all">All</option>
+                  <option value="today">Today</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid" style="margin-top:12px">
+              <div class="card">
+                <h3>Total Customers</h3>
+                <div class="big-num" id="statTotalCustomers">0</div>
+              </div>
+              <div class="card">
+                <h3>Pending Repairs</h3>
+                <div class="big-num" id="statPending">0</div>
+              </div>
+              <div class="card">
+                <h3>Completed Repairs</h3>
+                <div class="big-num" id="statCompleted">0</div>
+              </div>
+              <div class="card">
+                <h3>Total Revenue (Paid)</h3>
+                <div class="big-num" id="statRevenue">₨0</div>
+              </div>
+              <div class="card">
+                <h3>Total Expenses</h3>
+                <div class="big-num" id="statExpenses">₨0</div>
+              </div>
+              <div class="card">
+                <h3>Net Profit</h3>
+                <div class="big-num" id="statProfit">₨0</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Income Summary</h3>
+                <div style="color:var(--muted);font-size:13px">Shows paid amounts from customer records</div>
+              </div>
+              <div id="incomeSummary" style="margin-top:8px">
+                <table class="table" id="incomeTable">
+                  <thead>
+                    <tr><th>Date</th><th>Customer</th><th>Paid</th><th>Note</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customers -->
+          <div id="customersPage" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h2 style="margin:0">Customers</h2>
+              <div class="controls">
+                <input id="custSearch" placeholder="Search by name, phone, device" />
+                <label style="font-size:13px;color:var(--muted)">Sort By</label>
+                <select id="custFilter" class="btn">
+                  <option value="all">All</option>
+                  <option value="today">Today</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+                <button class="btn primary" id="addCustomerBtn"><i class="fa-solid fa-plus"></i> Add</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px" id="custFormWrap"></div>
+
+            <div style="margin-top:12px">
+              <table class="table" id="customersTable">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Name</th><th>Phone</th><th>Device</th><th>Issue</th><th>Repair Cost</th><th>Paid</th><th>Repair Status</th><th>Payment Status</th><th>Date</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Expenses -->
+          <div id="expensesPage" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h2 style="margin:0">Expenses</h2>
+              <div class="controls">
+                <input id="expSearch" placeholder="Search by category or note" />
+                <label style="font-size:13px;color:var(--muted)">Sort By</label>
+                <select id="expFilter" class="btn">
+                  <option value="all">All</option>
+                  <option value="today">Today</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+                <button class="btn primary" id="addExpenseBtn"><i class="fa-solid fa-plus"></i> Add</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="grid" style="grid-template-columns:repeat(3,1fr);">
+                <div class="card">
+                  <h3>Total Expenses</h3>
+                  <div class="big-num" id="expTotal">₨0</div>
+                </div>
+                <div class="card">
+                  <h3>Monthly Expenses</h3>
+                  <div class="big-num" id="expMonthly">₨0</div>
+                </div>
+                <div class="card">
+                  <h3>Weekly Expenses</h3>
+                  <div class="big-num" id="expWeekly">₨0</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <table class="table" id="expensesTable">
+                <thead><tr><th>#</th><th>Category</th><th>Amount</th><th>Note</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- User Management (Admin only) -->
+          <div id="usersPage" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h2 style="margin:0">User Management</h2>
+              <div class="controls">
+                <button class="btn primary" id="addUserBtn"><i class="fa-solid fa-user-plus"></i> Add User</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <table class="table" id="usersTable">
+                <thead><tr><th>#</th><th>Username</th><th>Full Name</th><th>Role</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        Developed by Ali Market | Contact: +923197608667 — Sponsored by Qasim Mobiles Bhagtanwala
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    /*****************************************************************
+     * Final complete app (sidebar removed, top nav used)
+     *****************************************************************/
+    const $ = (s, root=document) => root.querySelector(s);
+    const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+    const oneDay = 24*60*60*1000;
+    function formatCurrency(n){ return '₨' + Number(n||0).toLocaleString('en-PK'); }
+    function parseNumber(v){ return Number(String(v||'0').replace(/[^0-9.-]/g,'')) || 0; }
+    function todayStart(d=new Date()) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+    // Time filter helper
+    function withinFilter(dateStr, filter){
+      const d = new Date(dateStr);
+      if(isNaN(d)) return false;
+      const now = new Date();
+      if(filter==='all') return true;
+      if(filter==='today') return d >= todayStart(now);
+      if(filter==='weekly') return d >= new Date(now.getFullYear(), now.getMonth(), now.getDate()-7);
+      if(filter==='monthly') return d >= new Date(now.getFullYear(), now.getMonth(), 1);
+      if(filter==='yearly') return d >= new Date(now.getFullYear(), 0, 1);
+      return true;
+    }
+
+    // localStorage keys + helpers
+    const USERS_KEY = 'mm_users';
+    function getUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }catch(e){ return []; } }
+    function saveUsers(list){ localStorage.setItem(USERS_KEY, JSON.stringify(list)); }
+    function getDataKeyForUser(username){ return 'mm_data_' + username; }
+    function getUserData(username){ try{ return JSON.parse(localStorage.getItem(getDataKeyForUser(username))) || {customers:[], expenses:[]} }catch(e){ return {customers:[], expenses:[]} } }
+    function saveUserData(username, data){ localStorage.setItem(getDataKeyForUser(username), JSON.stringify(data)); }
+
+    function genId(){ return 'id_' + Math.random().toString(36).slice(2,9); }
+
+    // seed admin if missing
+    (function seed(){
+      let users = getUsers();
+      if(!users.find(u=>u.username==='asad33')){
+        users.push({username:'asad33', password:'asad33', fullName:'Asad Ali', role:'admin'});
+        saveUsers(users);
+      }
+      if(!localStorage.getItem(getDataKeyForUser('asad33'))){
+        const sample = {
+          customers:[
+            {id: genId(), name:'Amir Khan', phone:'03001234567', device:'iPhone X', issue:'Screen broken', repairCost:12000, paidAmount:12000, repairStatus:'Completed', paymentStatus:'Paid', date:new Date().toISOString()},
+            {id: genId(), name:'Nida B', phone:'03007654321', device:'Samsung S9', issue:'Battery issue', repairCost:5000, paidAmount:2000, repairStatus:'Pending', paymentStatus:'Partial', date:new Date(Date.now()-3*oneDay).toISOString()},
+          ],
+          expenses:[
+            {id: genId(), category:'Parts', amount:3000, note:'LCD purchase', date:new Date().toISOString()},
+            {id: genId(), category:'Rent', amount:15000, note:'Monthly rent', date:new Date(Date.now()-10*oneDay).toISOString()}
+          ]
+        };
+        saveUserData('asad33', sample);
+      }
+    })();
+
+    // state & UI refs
+    const chooseLogin = $('#chooseLogin');
+    const loginView = $('#loginView');
+    const loginTitle = $('#loginTitle');
+    const loginForm = $('#loginForm');
+    const backToChoose = $('#backToChoose');
+    const loginNote = $('#loginNote');
+    const appViews = $('#appViews');
+
+    const currentUserChip = $('#currentUserChip');
+    const userFullName = $('#userFullName');
+    const userRoleSmall = $('#userRoleSmall');
+    const userAvatar = $('#userAvatar');
+    const userMgmtLink = $('#userMgmtLink');
+
+    const navLinksContainer = $('#topNavLinks');
+    const navLinks = $$('#topNavLinks a[data-page]');
+
+    const analyticsPage = $('#analyticsPage');
+    const analyticsFilter = $('#analyticsFilter');
+
+    const customersPage = $('#customersPage');
+    const addCustomerBtn = $('#addCustomerBtn');
+    const customersTableBody = $('#customersTable tbody');
+    const custFilter = $('#custFilter');
+    const custSearch = $('#custSearch');
+
+    const expensesPage = $('#expensesPage');
+    const addExpenseBtn = $('#addExpenseBtn');
+    const expensesTableBody = $('#expensesTable tbody');
+    const expFilter = $('#expFilter');
+    const expSearch = $('#expSearch');
+
+    const usersPage = $('#usersPage');
+    const usersTableBody = $('#usersTable tbody');
+    const addUserBtn = $('#addUserBtn');
+
+    const incomeTableBody = $('#incomeTable tbody');
+    const statTotalCustomers = $('#statTotalCustomers');
+    const statPending = $('#statPending');
+    const statCompleted = $('#statCompleted');
+    const statRevenue = $('#statRevenue');
+    const statExpenses = $('#statExpenses');
+    const statProfit = $('#statProfit');
+
+    const expTotal = $('#expTotal');
+    const expMonthly = $('#expMonthly');
+    const expWeekly = $('#expWeekly');
+
+    const globalSearch = $('#globalSearch');
+
+    let STATE = { currentUser: null, loginMode: null, view: 'choose' };
+
+    // UI wiring
+    $('#logoutLink').addEventListener('click', (e)=>{ e.preventDefault(); logout(); });
+
+    // nav link clicks
+    function bindNavLinks(){
+      // re-query anchors (they may be updated) and attach listeners
+      const links = $$('#topNavLinks a[data-page]');
+      links.forEach(a=>{
+        a.removeEventListener('click', navClickHandler);
+        a.addEventListener('click', navClickHandler);
+      });
+    }
+    function navClickHandler(ev){
+      ev.preventDefault();
+      const p = this.dataset.page;
+      if(p) showPage(p);
+    }
+    bindNavLinks();
+
+    $('#adminLoginBtn').addEventListener('click', ()=> openLoginFor('admin'));
+    $('#userLoginBtn').addEventListener('click', ()=> openLoginFor('user'));
+    backToChoose.addEventListener('click', ()=> showChoose());
+
+    loginForm.addEventListener('submit', (e)=>{ e.preventDefault(); doLogin(); });
+
+    analyticsFilter.addEventListener('change', renderAnalytics);
+    addCustomerBtn.addEventListener('click', ()=> showCustomerForm());
+    if(custFilter) custFilter.addEventListener('change', renderCustomers);
+    if(custSearch) custSearch.addEventListener('input', renderCustomers);
+
+    addExpenseBtn.addEventListener('click', ()=> showExpenseForm());
+    if(expFilter) expFilter.addEventListener('change', renderExpenses);
+    if(expSearch) expSearch.addEventListener('input', renderExpenses);
+
+    addUserBtn.addEventListener('click', ()=> showAddUserForm());
+    globalSearch.addEventListener('input', ()=> {
+      if(STATE.view === 'customers') { if(custSearch) custSearch.value = globalSearch.value; renderCustomers(); }
+      if(STATE.view === 'expenses') { if(expSearch) expSearch.value = globalSearch.value; renderExpenses(); }
+    });
+
+    // login flow
+    function openLoginFor(mode){
+      STATE.loginMode = mode; chooseLogin.style.display = 'none'; loginView.style.display = ''; appViews.style.display='none';
+      loginTitle.textContent = mode === 'admin' ? 'Admin Sign in' : 'User Sign in';
+      $('#loginUsername').value=''; $('#loginPassword').value=''; loginNote.textContent='';
+    }
+    function showChoose(){ STATE.loginMode = null; chooseLogin.style.display=''; loginView.style.display='none'; appViews.style.display='none'; }
+    function doLogin(){
+      const u = $('#loginUsername').value.trim(); const p = $('#loginPassword').value;
+      if(!u || !p) { loginNote.textContent = 'Enter username & password'; return; }
+      const users = getUsers();
+      const user = users.find(x=>x.username===u && x.password===p);
+      if(!user){ loginNote.textContent = 'Invalid credentials'; return; }
+      if(STATE.loginMode==='admin' && user.role!=='admin'){ loginNote.textContent = 'Must use admin account here'; return; }
+      if(STATE.loginMode==='user' && user.role!=='user' && user.role!=='admin'){ loginNote.textContent = 'Must use user account here'; return; }
+
+      STATE.currentUser = {...user}; STATE.usersList = users;
+      loginView.style.display = 'none'; appViews.style.display = '';
+      updateUserUI();
+
+      // ensure user data exists
+      if(!localStorage.getItem(getDataKeyForUser(STATE.currentUser.username))){
+        saveUserData(STATE.currentUser.username, {customers:[], expenses:[]});
+      }
+
+      showPage('analytics'); renderUsers(); renderCustomers(); renderExpenses(); renderAnalytics();
+    }
+
+    function logout(){
+      if(!confirm('Log out?')) return;
+      STATE.currentUser = null; appViews.style.display = 'none'; showChoose();
+      $$('#topNavLinks a').forEach(a=> a.classList.remove('active'));
+      updateUserUI();
+    }
+
+    function updateUserUI(){
+      if(STATE.currentUser){
+        currentUserChip.textContent = STATE.currentUser.fullName + ' (' + STATE.currentUser.role + ')';
+        userFullName.textContent = STATE.currentUser.fullName;
+        userRoleSmall.textContent = STATE.currentUser.role.toUpperCase();
+        userAvatar.textContent = STATE.currentUser.fullName.split(' ').map(s=>s[0]).slice(0,2).join('');
+        if(STATE.currentUser.role === 'admin') userMgmtLink.style.display='inline-flex'; else userMgmtLink.style.display='none';
+      } else {
+        currentUserChip.textContent = 'Not logged'; userFullName.textContent='Guest'; userRoleSmall.textContent='Not logged'; userAvatar.textContent='G'; userMgmtLink.style.display='none';
+      }
+    }
+
+    function showPage(page){
+      STATE.view = page;
+      // toggle active link
+      $$('#topNavLinks a[data-page]').forEach(a=> a.classList.toggle('active', a.dataset.page === page));
+      [analyticsPage, customersPage, expensesPage, usersPage].forEach(p=>p.style.display='none');
+      if(page==='analytics'){ analyticsPage.style.display=''; renderAnalytics(); }
+      if(page==='customers'){ customersPage.style.display=''; renderCustomers(); }
+      if(page==='expenses'){ expensesPage.style.display=''; renderExpenses(); }
+      if(page==='users'){ if(!STATE.currentUser || STATE.currentUser.role!=='admin'){ alert('Admins only'); showPage('analytics'); return; } usersPage.style.display=''; renderUsers(); }
+    }
+
+    // Customers per-user
+    function getCustomers(){
+      if(!STATE.currentUser) return [];
+      return getUserData(STATE.currentUser.username).customers || [];
+    }
+    function saveCustomers(list){
+      if(!STATE.currentUser) return;
+      const d = getUserData(STATE.currentUser.username); d.customers = list; saveUserData(STATE.currentUser.username, d);
+    }
+
+    function renderCustomers(){
+      const list = getCustomers();
+      const filter = custFilter ? (custFilter.value || 'all') : 'all';
+      const q = (custSearch && custSearch.value) ? custSearch.value.toLowerCase().trim() : '';
+      const filtered = list.filter(c=>{
+        const matchesFilter = withinFilter(c.date, filter);
+        const matchesQuery = q === '' || (c.name||'').toLowerCase().includes(q) || (c.phone||'').toLowerCase().includes(q) || (c.device||'').toLowerCase().includes(q);
+        return matchesFilter && matchesQuery;
+      }).sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+      customersTableBody.innerHTML='';
+      filtered.forEach((c,i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${escapeHtml(c.name)}</td>
+          <td>${escapeHtml(c.phone)}</td>
+          <td>${escapeHtml(c.device)}</td>
+          <td>${escapeHtml(c.issue)}</td>
+          <td>${formatCurrency(c.repairCost)}</td>
+          <td>${formatCurrency(c.paidAmount)}</td>
+          <td><span class="status ${String(c.repairStatus||'').toLowerCase()==='completed'?'completed':'pending'}">${escapeHtml(c.repairStatus||'Pending')}</span></td>
+          <td>${escapeHtml(c.paymentStatus||'')}</td>
+          <td>${new Date(c.date).toLocaleString()}</td>
+          <td>
+            <button class="btn" data-action="edit" data-id="${c.id}"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn danger" data-action="del" data-id="${c.id}"><i class="fa-solid fa-trash"></i></button>
+          </td>`;
+        customersTableBody.appendChild(tr);
+      });
+
+      $$('#customersTable button[data-action]').forEach(b=>{
+        b.addEventListener('click', ()=> {
+          const act = b.dataset.action; const id = b.dataset.id;
+          if(act==='edit') editCustomer(id);
+          if(act==='del'){ if(confirm('Delete customer?')){ deleteCustomer(id); renderCustomers(); renderAnalytics(); } }
+        });
+      });
+    }
+
+    function showCustomerForm(existing){
+      const wrap = document.createElement('div'); wrap.className='card fade-in'; wrap.style.marginTop='12px';
+      const isEdit = !!existing;
+      wrap.innerHTML = `
+        <h3>${isEdit?'Edit':'Add'} Customer</h3>
+        <form id="custForm" style="display:flex;flex-direction:column;gap:8px">
+          <div class="form-row">
+            <input id="c_name" placeholder="Full name" required />
+            <input id="c_phone" placeholder="Phone" required />
+          </div>
+          <div class="form-row">
+            <input id="c_device" placeholder="Device (model)" required />
+            <input id="c_issue" placeholder="Issue/notes" />
+          </div>
+          <div class="form-row">
+            <input id="c_repairCost" placeholder="Repair cost" required />
+            <input id="c_paidAmount" placeholder="Paid amount" />
+          </div>
+          <div class="form-row">
+            <select id="c_repairStatus"><option>Pending</option><option>Completed</option><option>Cancelled</option></select>
+            <select id="c_paymentStatus"><option>Unpaid</option><option>Partial</option><option>Paid</option></select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" type="submit">${isEdit?'Save':'Add'}</button>
+            <button class="btn" type="button" id="custCancel">Cancel</button>
+          </div>
+        </form>`;
+      $('#custFormWrap').innerHTML=''; $('#custFormWrap').appendChild(wrap);
+
+      if(isEdit){
+        $('#c_name').value = existing.name; $('#c_phone').value = existing.phone; $('#c_device').value = existing.device;
+        $('#c_issue').value = existing.issue; $('#c_repairCost').value = existing.repairCost; $('#c_paidAmount').value = existing.paidAmount;
+        $('#c_repairStatus').value = existing.repairStatus; $('#c_paymentStatus').value = existing.paymentStatus;
+      }
+
+      $('#custCancel').addEventListener('click', ()=> $('#custFormWrap').innerHTML='');
+      $('#custForm').addEventListener('submit', (e)=>{ e.preventDefault();
+        const obj = {
+          id: isEdit ? existing.id : genId(),
+          name: $('#c_name').value.trim(),
+          phone: $('#c_phone').value.trim(),
+          device: $('#c_device').value.trim(),
+          issue: $('#c_issue').value.trim(),
+          repairCost: parseNumber($('#c_repairCost').value),
+          paidAmount: parseNumber($('#c_paidAmount').value),
+          repairStatus: $('#c_repairStatus').value,
+          paymentStatus: $('#c_paymentStatus').value,
+          date: isEdit ? existing.date : new Date().toISOString()
+        };
+        const items = getCustomers();
+        if(isEdit){ const idx = items.findIndex(x=>x.id===existing.id); if(idx>=0) items[idx]=obj; }
+        else items.unshift(obj);
+        saveCustomers(items); $('#custFormWrap').innerHTML=''; renderCustomers(); renderAnalytics();
+      });
+    }
+
+    function editCustomer(id){ const item = getCustomers().find(x=>x.id===id); if(item) showCustomerForm(item); }
+    function deleteCustomer(id){ let items = getCustomers().filter(x=>x.id!==id); saveCustomers(items); }
+
+    // Expenses per-user
+    function getExpenses(){ if(!STATE.currentUser) return []; return getUserData(STATE.currentUser.username).expenses || []; }
+    function saveExpenses(list){ if(!STATE.currentUser) return; const d=getUserData(STATE.currentUser.username); d.expenses=list; saveUserData(STATE.currentUser.username,d); }
+
+    function renderExpenses(){
+      const list = getExpenses();
+      const filter = expFilter ? (expFilter.value || 'all') : 'all';
+      const q = (expSearch && expSearch.value)? expSearch.value.toLowerCase().trim() : '';
+      const filtered = list.filter(e=>{
+        const matchesFilter = withinFilter(e.date, filter);
+        const matchesQuery = q==='' || (e.category||'').toLowerCase().includes(q) || (e.note||'').toLowerCase().includes(q);
+        return matchesFilter && matchesQuery;
+      }).sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+      expensesTableBody.innerHTML='';
+      filtered.forEach((e,i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.category)}</td><td>${formatCurrency(e.amount)}</td><td>${escapeHtml(e.note)}</td><td>${new Date(e.date).toLocaleString()}</td>
+          <td>
+            <button class="btn" data-act="edit" data-id="${e.id}"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn danger" data-act="del" data-id="${e.id}"><i class="fa-solid fa-trash"></i></button>
+          </td>`;
+        expensesTableBody.appendChild(tr);
+      });
+
+      $$('#expensesTable button[data-act]').forEach(b=> b.addEventListener('click', ()=>{
+        const act=b.dataset.act, id=b.dataset.id;
+        if(act==='edit') editExpense(id);
+        if(act==='del'){ if(confirm('Delete expense?')){ deleteExpense(id); renderExpenses(); renderAnalytics(); } }
+      }));
+
+      const total = list.reduce((s,x)=>s+parseNumber(x.amount),0); expTotal.textContent = formatCurrency(total);
+      const now = new Date(); const monthStart = new Date(now.getFullYear(), now.getMonth(),1);
+      const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()-7);
+      const monthly = list.filter(x=>new Date(x.date)>=monthStart).reduce((s,x)=>s+parseNumber(x.amount),0);
+      const weekly = list.filter(x=>new Date(x.date)>=weekStart).reduce((s,x)=>s+parseNumber(x.amount),0);
+      expMonthly.textContent = formatCurrency(monthly); expWeekly.textContent = formatCurrency(weekly);
+    }
+
+    function showExpenseForm(existing){
+      const wrap = document.createElement('div'); wrap.className='card fade-in';
+      const isEdit = !!existing;
+      wrap.innerHTML = `
+        <h3>${isEdit?'Edit':'Add'} Expense</h3>
+        <form id="expForm" style="display:flex;flex-direction:column;gap:8px;max-width:520px">
+          <div class="form-row">
+            <input id="e_category" placeholder="Category (Parts, Rent...)" required />
+            <input id="e_amount" placeholder="Amount" required />
+          </div>
+          <div class="form-row">
+            <input id="e_note" placeholder="Note" />
+            <input id="e_date" type="datetime-local" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" type="submit">${isEdit?'Save':'Add'}</button>
+            <button class="btn" type="button" id="expCancel">Cancel</button>
+          </div>
+        </form>`;
+      const container = document.createElement('div'); container.style.marginTop='12px'; container.appendChild(wrap);
+      $('#expensesPage').insertBefore(container, $('#expensesPage').children[1]);
+
+      if(isEdit){ $('#e_category').value = existing.category; $('#e_amount').value = existing.amount; $('#e_note').value = existing.note; try{ $('#e_date').value = new Date(existing.date).toISOString().slice(0,16); }catch(e){} } else { $('#e_date').value = new Date().toISOString().slice(0,16); }
+
+      $('#expCancel').addEventListener('click', ()=> container.remove());
+      $('#expForm').addEventListener('submit', (e)=>{ e.preventDefault();
+        const obj = { id: isEdit? existing.id: genId(), category: $('#e_category').value.trim(), amount: parseNumber($('#e_amount').value), note: $('#e_note').value.trim(), date: $('#e_date').value? new Date($('#e_date').value).toISOString() : new Date().toISOString() };
+        const items = getExpenses();
+        if(isEdit){ const idx = items.findIndex(x=>x.id===existing.id); if(idx>=0) items[idx]=obj; } else items.unshift(obj);
+        saveExpenses(items); container.remove(); renderExpenses(); renderAnalytics();
+      });
+    }
+
+    function editExpense(id){ const it = getExpenses().find(x=>x.id===id); if(it) showExpenseForm(it); }
+    function deleteExpense(id){ const items = getExpenses().filter(x=>x.id!==id); saveExpenses(items); }
+
+    // Users admin
+    function renderUsers(){
+      const users = getUsers();
+      usersTableBody.innerHTML='';
+      users.forEach((u,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.fullName)}</td><td>${escapeHtml(u.role)}</td><td><button class="btn" data-act="view" data-username="${u.username}"><i class="fa-solid fa-eye"></i></button> <button class="btn danger" data-act="del" data-username="${u.username}"><i class="fa-solid fa-trash"></i></button></td>`; usersTableBody.appendChild(tr); });
+
+      $$('#usersTable button[data-act]').forEach(b=> b.addEventListener('click', ()=>{
+        const act=b.dataset.act, username=b.dataset.username;
+        if(act==='view'){ const u = getUsers().find(x=>x.username===username); alert(JSON.stringify(u,null,2)); }
+        if(act==='del'){ if(!STATE.currentUser || username===STATE.currentUser.username) return alert('Cannot delete yourself'); if(confirm('Delete user and data?')){ let us=getUsers().filter(x=>x.username!==username); saveUsers(us); localStorage.removeItem(getDataKeyForUser(username)); renderUsers(); } }
+      }));
+    }
+
+    function showAddUserForm(){
+      const wrap=document.createElement('div'); wrap.className='card fade-in'; wrap.style.marginTop='12px';
+      wrap.innerHTML=`<h3>Add New User</h3><form id="addUserForm" style="display:flex;flex-direction:column;gap:8px;max-width:520px"><div class="form-row"><input id="u_username" placeholder="Username" required /><input id="u_fullname" placeholder="Full name" required /></div><div class="form-row"><input id="u_password" placeholder="Password" required /><select id="u_role"><option value="user">User</option><option value="admin">Admin</option></select></div><div style="display:flex;gap:8px"><button class="btn primary" type="submit">Create</button><button class="btn" type="button" id="addUserCancel">Cancel</button></div></form>`;
+      usersPage.insertBefore(wrap, usersPage.children[1]);
+      $('#addUserCancel').addEventListener('click', ()=> wrap.remove());
+      $('#addUserForm').addEventListener('submit',(e)=>{ e.preventDefault(); const username=$('#u_username').value.trim(); const fullname=$('#u_fullname').value.trim(); const password=$('#u_password').value; const role=$('#u_role').value; if(!username||!password) return alert('username & password required'); const users=getUsers(); if(users.find(x=>x.username===username)) return alert('exists'); users.push({username,password,fullName:fullname||username,role}); saveUsers(users); wrap.remove(); renderUsers(); });
+    }
+
+    // Analytics uses paidAmount
+    function renderAnalytics(){
+      if(!STATE.currentUser) return;
+      const filter = analyticsFilter ? (analyticsFilter.value || 'all') : 'all';
+      const customers = getCustomers().filter(c=> withinFilter(c.date, filter));
+      const expenses = getExpenses().filter(e=> withinFilter(e.date, filter));
+      statTotalCustomers.textContent = customers.length;
+      statPending.textContent = customers.filter(c=> (c.repairStatus||'').toLowerCase()!=='completed').length;
+      statCompleted.textContent = customers.filter(c=> (c.repairStatus||'').toLowerCase()==='completed').length;
+      const revenue = customers.reduce((s,c)=> s + parseNumber(c.paidAmount), 0);
+      const totalExpenses = expenses.reduce((s,e)=> s + parseNumber(e.amount), 0);
+      statRevenue.textContent = formatCurrency(revenue);
+      statExpenses.textContent = formatCurrency(totalExpenses);
+      statProfit.textContent = formatCurrency(revenue - totalExpenses);
+
+      incomeTableBody.innerHTML='';
+      customers.slice().sort((a,b)=> new Date(b.date)-new Date(a.date)).forEach(c=>{ if(parseNumber(c.paidAmount)<=0) return; const tr=document.createElement('tr'); tr.innerHTML=`<td>${new Date(c.date).toLocaleString()}</td><td>${escapeHtml(c.name)}</td><td>${formatCurrency(c.paidAmount)}</td><td>${escapeHtml(c.issue)}</td>`; incomeTableBody.appendChild(tr); });
+    }
+
+    // helper escape
+    function escapeHtml(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+
+    // initial UI state
+    (function init(){
+      updateUserUI(); showChoose();
+      bindNavLinks();
+      // attach global search behavior
+      globalSearch.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ if(STATE.view==='customers') renderCustomers(); if(STATE.view==='expenses') renderExpenses(); }});
+      window.addEventListener('storage', ()=> { if(STATE.currentUser){ renderCustomers(); renderExpenses(); renderUsers(); renderAnalytics(); }});
+    })();
+
+    // expose small helpers (optional)
+    window.showCustomerForm = showCustomerForm; window.showExpenseForm = showExpenseForm; window.showAddUserForm = showAddUserForm;
+
+  </script>
+</body>
+</html>
